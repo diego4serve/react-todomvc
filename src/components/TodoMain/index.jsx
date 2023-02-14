@@ -1,8 +1,10 @@
-import React, { useContext } from "react";
+import React, { useContext, useRef, useState } from "react";
 import TodoContext from "../../context/TodoContext";
 
 const TodoMain = () => {
   const { todos, setTodos, filter } = useContext(TodoContext);
+  const [editing, setEditing] = useState(null);
+  const [inputValue, setInputValue] = useState("");
   const allChecked = todos.every(todo => todo.completed === true);
 
   const handleToggleAll = (event) => {
@@ -32,8 +34,43 @@ const TodoMain = () => {
     return false;
   });
 
-  const liTags = filteredTodos.map(todo => (
-    <li key={todo.id} className={todo.completed ? "completed" : ""}>
+  const inputRefs = useRef([]);
+
+  const handleFocus = (index, todoId, title) => {
+    setEditing(todoId);
+    setInputValue(title)
+    inputRefs.current[index].focus();
+  };
+
+  const handleKeyDown = (event, id) => {
+    if (event.key === "Enter") {
+    setTodos(prevTodos => prevTodos.map(todo => {
+      if (todo.id === id) {
+        return { ...todo, title: inputValue}
+      }
+      return todo;
+    }))
+    setEditing(null);
+  }
+  }
+
+  const handleOnBlur = (todoId) => {
+    setTodos(prevTodos => prevTodos.map(todo => {
+      if (todo.id === todoId) {
+        return { ...todo, title: inputValue}
+      }
+      return todo;
+    }))
+    setEditing(null);
+  }
+
+  const liTags = filteredTodos.map((todo, index) => (
+    <li
+      key={todo.id}
+      className={
+        todo.completed && editing !== todo.id ? "completed" : editing === todo.id ? "editing" : ""
+      }
+    >
       <div className="view">
         <input
           className="toggle"
@@ -41,13 +78,24 @@ const TodoMain = () => {
           checked={todo.completed}
           onChange={() => handleToggle(todo.id)}
         />
-        <label>{todo.title}</label>
+        <label onDoubleClick={() => handleFocus(index, todo.id, todo.title)}>
+          {todo.title}
+        </label>
         <button
           className="destroy"
           onClick={() => handleDestroy(todo.id)}
         ></button>
       </div>
-      <input key={todo.id} className="edit" value={todo.title} />
+      <input
+        ref={(el) => (inputRefs.current[index] = el)}
+        key={todo.id}
+        className="edit"
+        onChange={(event) => setInputValue(event.target.value)}
+        onKeyDown={(event) => handleKeyDown(event, todo.id)}
+        onBlur={() => handleOnBlur(todo.id)}
+        type="text"
+        value={inputValue}
+      />
     </li>
   ));
 
