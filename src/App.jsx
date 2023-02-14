@@ -1,17 +1,23 @@
-import React, { createContext, useState } from 'react';
+import React, { useState } from 'react';
 import TodoHeader from './components/TodoHeader';
 import TodoMain from './components/TodoMain';
 import TodoFooter from './components/TodoFooter';
 import InfoFooter from './components/InfoFooter';
-
-const TodoContext = createContext();
+import TodoContext from './context/TodoContext';
 
 const TodoApp = () => {
   const [todos, setTodos] = useState([]);
-  const [displayTodos, setDisplayTodos] = useState([]);
-  
+  const [filter, setFilter] = useState('all')
+
   return (
-    <TodoContext.Provider value={{todos, setTodos, displayTodos, setDisplayTodos}}>
+    <TodoContext.Provider
+      value={{
+        todos,
+        setTodos,
+        filter,
+        setFilter,
+      }}
+    >
       <section className="todoapp">
         <TodoHeader />
         <TodoMain />
