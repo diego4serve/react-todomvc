@@ -1,19 +1,13 @@
 import React, { useContext, useState } from "react";
 import TodoContext from "../../context/TodoContext";
-import generateId from "../../utils/generateId";
 
 const TodoHeader = () => {
-  const { todos, setTodos } = useContext(TodoContext);
+  const { dispatch } = useContext(TodoContext);
   const [inputValue, setInputValue] = useState("");
 
   const handleKeyDown = (event) => {
     if (event.key === "Enter") {
-      const newTodo= {
-        id: generateId(),
-        title: inputValue,
-        completed: false
-      }
-      setTodos([...todos, newTodo]);
+      dispatch({type: 'ADD_TODO', payload: inputValue})
       setInputValue("");
     }
   };

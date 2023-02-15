@@ -1,19 +1,20 @@
-import React, { useState } from 'react';
+import React, { useReducer, useState } from 'react';
 import TodoHeader from './components/TodoHeader';
 import TodoMain from './components/TodoMain';
 import TodoFooter from './components/TodoFooter';
 import InfoFooter from './components/InfoFooter';
 import TodoContext from './context/TodoContext';
+import TodoReducer from './reducers/TodoReducer';
 
 const TodoApp = () => {
-  const [todos, setTodos] = useState([]);
+  const [state, dispatch] = useReducer(TodoReducer, {todos: []});
   const [filter, setFilter] = useState('all')
 
   return (
     <TodoContext.Provider
       value={{
-        todos,
-        setTodos,
+        state,
+        dispatch,
         filter,
         setFilter,
       }}

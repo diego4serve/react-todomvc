@@ -2,18 +2,18 @@ import React, { useContext } from 'react';
 import TodoContext from '../../context/TodoContext';
 
 const TodoFooter = () => {
-  const { filter, setFilter, todos, setTodos } = useContext(TodoContext);
+  const { filter, setFilter, state, dispatch } = useContext(TodoContext);
 
   const handleClick = (filterName) => {
     setFilter(filterName);
   }
 
   const handleClearCompleted = () => {
-    setTodos(todos.filter(todo => !todo.completed));
+    dispatch({type: 'CLEAR_COMPLETED'});
   }
 
   const itemsLeft = () => {
-    const len = todos.filter(todo => !todo.completed).length;
+    const len = state.todos.filter(todo => !todo.completed).length;
     return (
       <span className="todo-count"><strong>{len}</strong> {len === 1 ? 'item' : 'items'} left</span>
     )

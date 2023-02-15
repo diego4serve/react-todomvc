@@ -1,70 +1,67 @@
-import React, { useContext, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import TodoContext from "../../context/TodoContext";
 
 const TodoMain = () => {
-  const { todos, setTodos, filter } = useContext(TodoContext);
-  const [editing, setEditing] = useState(null);
-  const [inputValue, setInputValue] = useState("");
-  const allChecked = todos.every(todo => todo.completed === true);
+  const { state, dispatch, filter } = useContext(TodoContext);
+  const [editing, setEditing] = useState(undefined);
+  const [inputValue, setInputValue] = useState(undefined);
+  const areAllChecked = state.todos.every(todo => todo.completed === true);
 
   const handleToggleAll = (event) => {
-    const isChecked = event.target.checked;
-    setTodos(todos.map(todo => {
-      return {...todo, completed: isChecked};
-    }))
+    dispatch({type: 'TOGGLE_COMPLETED_ALL', payload: event.target.checked})
   }
 
-  const handleToggle = (id) => {
-    setTodos(prevTodos => prevTodos.map(todo => {
-      if (todo.id === id) {
-        return { ...todo, completed: !todo.completed }
-      }
-      return todo;
-    }))
+  const handleToggle = (todoId) => {
+    dispatch({type: 'TOGGLE_COMPLETED', payload: todoId});
   }
 
-  const handleDestroy = (id) => {
-    setTodos(todos.filter(todo => todo.id !== id));
+  const handleDestroy = (todoId) => {
+    dispatch({type: 'DELETE_TODO', payload: todoId});
   }
 
-  const filteredTodos = todos.filter(todo => {
+  const filteredTodos = state.todos.filter(todo => {
     if (filter === "all") return true;
     if (filter === "active" && !todo.completed) return true;
     if (filter === "completed" && todo.completed) return true;
     return false;
   });
 
-  const inputRefs = useRef([]);
+  const inputRefs = useRef({});
 
-  const handleFocus = (index, todoId, title) => {
+  const handleFocus = (todoId, title) => {
     setEditing(todoId);
     setInputValue(title)
-    inputRefs.current[index].focus();
   };
 
-  const handleKeyDown = (event, id) => {
-    if (event.key === "Enter") {
-    setTodos(prevTodos => prevTodos.map(todo => {
-      if (todo.id === id) {
-        return { ...todo, title: inputValue}
-      }
-      return todo;
-    }))
-    setEditing(null);
-  }
-  }
+  useEffect(() => {
+    if (editing) {
+      inputRefs.current[editing].focus();
+    }
+  }, [editing])
+
+  const handleKeyDown = (event, todoId, title) => {
+    if (event.key === 'Enter') {
+      dispatch({ type: 'EDIT_TODO', payload: { id: todoId, title: inputValue } });
+      setEditing(null);
+    }
+    if (event.key === 'Escape') {
+      setInputValue(title)
+      setEditing(null);
+    }
+  };
 
   const handleOnBlur = (todoId) => {
-    setTodos(prevTodos => prevTodos.map(todo => {
-      if (todo.id === todoId) {
-        return { ...todo, title: inputValue}
-      }
-      return todo;
-    }))
+    dispatch({type: 'EDIT_TODO', payload: {id: todoId, title: inputValue}})
     setEditing(null);
-  }
+  };
 
-  const liTags = filteredTodos.map((todo, index) => (
+  const handleInputChange = (event, id) => {
+    if (id === editing) {
+      setInputValue(event.target.value);
+    }
+  };
+
+  const liTags = filteredTodos.map((todo) => (
     <li
       key={todo.id}
       className={
@@ -78,7 +75,7 @@ const TodoMain = () => {
           checked={todo.completed}
           onChange={() => handleToggle(todo.id)}
         />
-        <label onDoubleClick={() => handleFocus(index, todo.id, todo.title)}>
+        <label onDoubleClick={() => handleFocus(todo.id, todo.title)}>
           {todo.title}
         </label>
         <button
@@ -87,14 +84,15 @@ const TodoMain = () => {
         ></button>
       </div>
       <input
-        ref={(el) => (inputRefs.current[index] = el)}
+        ref={(el) => (inputRefs.current[todo.id] = el)}
         key={todo.id}
         className="edit"
-        onChange={(event) => setInputValue(event.target.value)}
-        onKeyDown={(event) => handleKeyDown(event, todo.id)}
+        onChange={(event) => handleInputChange(event, todo.id)}
+        onFocus={() => setEditing(todo.id)}
+        onKeyDown={(event) => handleKeyDown(event, todo.id, todo.title)}
         onBlur={() => handleOnBlur(todo.id)}
         type="text"
-        value={inputValue}
+        value={todo.id === editing ? inputValue : todo.title}
       />
     </li>
   ));
@@ -105,7 +103,7 @@ const TodoMain = () => {
         id="toggle-all"
         className="toggle-all"
         type="checkbox"
-        checked={allChecked}
+        checked={areAllChecked}
         onChange={handleToggleAll}
       />
       <label htmlFor="toggle-all">Mark all as complete</label>
