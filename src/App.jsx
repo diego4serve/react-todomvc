@@ -5,11 +5,12 @@ import TodoFooter from './components/TodoFooter';
 import InfoFooter from './components/InfoFooter';
 import TodoContext from './context/TodoContext';
 import TodoReducer from './reducers/TodoReducer';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
 
 const storedTodos = JSON.parse(localStorage.getItem("todos-react")) ?? [];
 
 const TodoApp = () => {
-  const [state, dispatch] = useReducer(TodoReducer, {todos: storedTodos});
+  const [state, dispatch] = useReducer(TodoReducer, { todos: storedTodos });
   const [filter, setFilter] = useState('all')
 
   return (
@@ -33,7 +34,13 @@ const TodoApp = () => {
 export default function App() {
   return (
     <>
-      <TodoApp />
+      <BrowserRouter>
+        <Routes>
+          <Route path='/' element={<TodoApp />} />
+          <Route path='/#/active' element={<TodoApp />} />
+          <Route path='/#/completed' element={<TodoApp />} />
+        </Routes>
+      </BrowserRouter>
       <InfoFooter />
     </>
   );

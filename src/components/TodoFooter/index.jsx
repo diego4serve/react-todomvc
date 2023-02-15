@@ -1,15 +1,40 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import TodoContext from '../../context/TodoContext';
 
 const TodoFooter = () => {
   const { filter, setFilter, state, dispatch } = useContext(TodoContext);
+  const location = useLocation();
+  const navigate = useNavigate();
 
-  const handleClick = (filterName) => {
-    setFilter(filterName);
+  useEffect(() => {
+    if (location.hash === '') {
+      navigate('/#/');
+    }
+  }, []);
+
+  const getFilterName = (string) => {
+    let filterName = 'all'
+    switch (string) {
+      case '#/active':
+        filterName = 'active';
+        break;
+      case '#/completed':
+        filterName = 'completed'
+        break;
+      default:
+        break;
+    }
+    return filterName;
   }
 
+  useEffect(() => {
+    const filterName = getFilterName(location.hash);
+    setFilter(filterName);
+  }, [location]);
+
   const handleClearCompleted = () => {
-    dispatch({type: 'CLEAR_COMPLETED'});
+    dispatch({ type: 'CLEAR_COMPLETED' });
   }
 
   const itemsLeft = () => {
@@ -23,13 +48,13 @@ const TodoFooter = () => {
       {itemsLeft()}
       <ul className="filters">
         <li>
-          <a className={filter === 'all' ? 'selected':''} onClick={() => handleClick('all')}>All</a>
+          <Link className={filter === 'all' ? 'selected' : ''} to='/#/'>All</Link>
         </li>
         <li>
-          <a className={filter === 'active' ? 'selected':''} onClick={() => handleClick('active')}>Active</a>
+          <Link className={filter === 'active' ? 'selected' : ''} to='/#/active'>Active</Link>
         </li>
         <li>
-          <a className={filter === 'completed' ? 'selected':''} onClick={() => handleClick('completed')}>Completed</a>
+          <Link className={filter === 'completed' ? 'selected' : ''} to='/#/completed'>Completed</Link>
         </li>
       </ul>
       <button className="clear-completed" onClick={handleClearCompleted}>Clear completed</button>
