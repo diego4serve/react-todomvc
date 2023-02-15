@@ -6,8 +6,10 @@ import InfoFooter from './components/InfoFooter';
 import TodoContext from './context/TodoContext';
 import TodoReducer from './reducers/TodoReducer';
 
+const storedTodos = JSON.parse(localStorage.getItem("todos-react")) ?? [];
+
 const TodoApp = () => {
-  const [state, dispatch] = useReducer(TodoReducer, {todos: []});
+  const [state, dispatch] = useReducer(TodoReducer, {todos: storedTodos});
   const [filter, setFilter] = useState('all')
 
   return (
