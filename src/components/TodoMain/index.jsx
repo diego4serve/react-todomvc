@@ -1,4 +1,5 @@
 import React, { useContext } from "react";
+import ActionTypes from "../../actions/TodoActions";
 import TodoContext from "../../context/TodoContext";
 import TodoList from "../TodoList";
 
@@ -7,7 +8,7 @@ const TodoMain = () => {
   const areAllChecked = state.todos.every(todo => todo.completed === true);
 
   const handleToggleAll = (event) => {
-    dispatch({type: 'TOGGLE_COMPLETED_ALL', payload: event.target.checked})
+    dispatch({type: ActionTypes.TOGGLE_COMPLETED_ALL, payload: event.target.checked})
   }
 
   return (

@@ -1,4 +1,5 @@
 import React, { useContext, useState } from "react";
+import ActionTypes from "../../actions/TodoActions";
 import TodoContext from "../../context/TodoContext";
 
 const TodoHeader = () => {
@@ -7,7 +8,7 @@ const TodoHeader = () => {
 
   const handleKeyDown = (event) => {
     if (event.key === "Enter") {
-      dispatch({type: 'ADD_TODO', payload: inputValue})
+      dispatch({type: ActionTypes.ADD_TODO, payload: inputValue})
       setInputValue("");
     }
   };

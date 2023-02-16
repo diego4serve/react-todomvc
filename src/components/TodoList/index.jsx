@@ -1,4 +1,5 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, { useCallback, useContext, useEffect, useRef, useState } from "react";
+import ActionTypes from "../../actions/TodoActions";
 import TodoContext from "../../context/TodoContext";
 
 const TodoList = () => {
@@ -10,13 +11,13 @@ const TodoList = () => {
     localStorage.setItem("todos-react", JSON.stringify(state.todos));
   }, [state]);
 
-  const handleToggle = (todoId) => {
-    dispatch({ type: "TOGGLE_COMPLETED", payload: todoId });
-  };
+  const handleToggle = useCallback((todoId) => {
+    dispatch({ type: ActionTypes.TOGGLE_COMPLETED, payload: todoId });
+  });
 
-  const handleDestroy = (todoId) => {
-    dispatch({ type: "DELETE_TODO", payload: todoId });
-  };
+  const handleDestroy = useCallback((todoId) => {
+    dispatch({ type: ActionTypes.DELETE_TOD0, payload: todoId });
+  });
 
   const filteredTodos = state.todos.filter((todo) => {
     if (filter === "all") return true;
@@ -27,10 +28,10 @@ const TodoList = () => {
 
   const inputRefs = useRef({});
 
-  const handleFocus = (todoId, title) => {
+  const handleFocus = useCallback((todoId, title) => {
     setEditing(todoId);
     setInputValue(title);
-  };
+  });
 
   useEffect(() => {
     if (editing) {
@@ -38,10 +39,10 @@ const TodoList = () => {
     }
   }, [editing]);
 
-  const handleKeyDown = (event, todoId, title) => {
+  const handleKeyDown = useCallback((event, todoId, title) => {
     if (event.key === "Enter") {
       dispatch({
-        type: "EDIT_TODO",
+        type: ActionTypes.EDIT_TODO,
         payload: { id: todoId, title: inputValue },
       });
       setEditing(null);
@@ -50,18 +51,18 @@ const TodoList = () => {
       setInputValue(title);
       setEditing(null);
     }
-  };
+  });
 
-  const handleOnBlur = (todoId) => {
-    dispatch({ type: "EDIT_TODO", payload: { id: todoId, title: inputValue } });
+  const handleOnBlur = useCallback((todoId) => {
+    dispatch({ type: ActionTypes.EDIT_TODO, payload: { id: todoId, title: inputValue } });
     setEditing(null);
-  };
+  });
 
-  const handleInputChange = (event, id) => {
+  const handleInputChange = useCallback((event, id) => {
     if (id === editing) {
       setInputValue(event.target.value);
     }
-  };
+  });
 
   return (
     <ul className="todo-list">

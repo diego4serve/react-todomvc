@@ -1,5 +1,6 @@
 import React, { useContext, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import ActionTypes from "../../actions/TodoActions";
 import TodoContext from '../../context/TodoContext';
 
 const TodoFooter = () => {
@@ -34,7 +35,7 @@ const TodoFooter = () => {
   }, [location]);
 
   const handleClearCompleted = () => {
-    dispatch({ type: 'CLEAR_COMPLETED' });
+    dispatch({ type: ActionTypes.CLEAR_COMPLETED });
   }
 
   const itemsLeft = () => {
